@@ -19,22 +19,11 @@
  */
 package org.sonar.plugins.dotnet.tests;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
-import com.google.common.io.Closeables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Map;
 
 public class OpenCoverReportParser implements CoverageParser {
@@ -49,6 +38,7 @@ public class OpenCoverReportParser implements CoverageParser {
 
   @Override
   public Coverage parse() {
+    LOG.info("Parsing the OpenCover report " + file.getAbsolutePath());
     return new Parser(file).parse();
   }
 
@@ -65,66 +55,50 @@ public class OpenCoverReportParser implements CoverageParser {
     }
 
     public Coverage parse() {
-      LOG.info("Parsing the OpenCover report " + file.getAbsolutePath());
-
-      InputStreamReader reader = null;
-      XMLStreamReader stream = null;
-
       try {
-        reader = new InputStreamReader(new FileInputStream(file), Charsets.UTF_8);
-        XMLInputFactory xmlFactory = XMLInputFactory.newInstance();
-        stream = xmlFactory.createXMLStreamReader(reader);
-        xmlParserHelper = new XmlParserHelper(file, stream);
-
-        checkRootTag();
-
-        while (stream.hasNext()) {
-          if (stream.next() == XMLStreamConstants.START_ELEMENT) {
-            String tagName = stream.getLocalName();
-
-            if ("File".equals(tagName)) {
-              handleFileTag();
-            } else if ("FileRef".equals(tagName)) {
-              handleFileRef();
-            } else if ("SequencePoint".equals(tagName)) {
-              handleSegmentPointTag();
-            }
-          }
-        }
-      } catch (IOException e) {
-        throw Throwables.propagate(e);
-      } catch (XMLStreamException e) {
-        throw Throwables.propagate(e);
+        xmlParserHelper = new XmlParserHelper(file);
+        xmlParserHelper.checkRootTag("CoverageSession");
+        dispatchTags();
       } finally {
-        XmlParserHelper.closeXmlStream(stream);
-        Closeables.closeQuietly(reader);
+        if (xmlParserHelper != null) {
+          xmlParserHelper.close();
+        }
       }
 
       return coverage;
     }
 
-    private void handleFileRef() throws XMLStreamException {
+    private void dispatchTags() {
+      String tagName;
+      while ((tagName = xmlParserHelper.nextTag()) != null) {
+        if ("File".equals(tagName)) {
+          handleFileTag();
+        } else if ("FileRef".equals(tagName)) {
+          handleFileRef();
+        } else if ("SequencePoint".equals(tagName)) {
+          handleSegmentPointTag();
+        }
+      }
+    }
+
+    private void handleFileRef() {
       this.fileRef = xmlParserHelper.getRequiredAttribute("uid");
     }
 
-    private void handleFileTag() throws XMLStreamException {
+    private void handleFileTag() {
       String uid = xmlParserHelper.getRequiredAttribute("uid");
       String fullPath = xmlParserHelper.getRequiredAttribute("fullPath");
 
       files.put(uid, fullPath);
     }
 
-    private void handleSegmentPointTag() throws XMLStreamException {
+    private void handleSegmentPointTag() {
       int line = xmlParserHelper.getRequiredIntAttribute("sl");
       int vc = xmlParserHelper.getRequiredIntAttribute("vc");
 
       if (files.containsKey(fileRef)) {
         coverage.addHits(files.get(fileRef), line, vc);
       }
-    }
-
-    private void checkRootTag() throws XMLStreamException {
-      xmlParserHelper.checkRootTag("CoverageSession");
     }
 
   }

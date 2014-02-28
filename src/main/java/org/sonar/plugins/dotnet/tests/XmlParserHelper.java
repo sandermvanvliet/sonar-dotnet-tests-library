@@ -19,30 +19,67 @@
  */
 package org.sonar.plugins.dotnet.tests;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
+import com.google.common.io.Closeables;
 
 import javax.annotation.Nullable;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
 
 public class XmlParserHelper {
 
   private final File file;
+  private final InputStreamReader reader;
   private final XMLStreamReader stream;
 
-  public XmlParserHelper(File file, XMLStreamReader stream) {
-    this.file = file;
-    this.stream = stream;
+  public XmlParserHelper(File file) {
+    try {
+      this.file = file;
+      this.reader = new InputStreamReader(new FileInputStream(file), Charsets.UTF_8);
+      XMLInputFactory xmlFactory = XMLInputFactory.newInstance();
+      this.stream = xmlFactory.createXMLStreamReader(reader);
+
+    } catch (FileNotFoundException e) {
+      throw Throwables.propagate(e);
+    } catch (XMLStreamException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
-  public void checkRootTag(String name) throws XMLStreamException {
-    int event = stream.nextTag();
+  public void checkRootTag(String name) {
+    int event;
+
+    try {
+      event = stream.nextTag();
+    } catch (XMLStreamException e) {
+      throw Throwables.propagate(e);
+    }
 
     if (event != XMLStreamConstants.START_ELEMENT || !name.equals(stream.getLocalName())) {
       throw parseError("Missing root element <" + name + ">");
+    }
+  }
+
+  @Nullable
+  public String nextTag() {
+    try {
+      while (stream.hasNext()) {
+        if (stream.next() == XMLStreamConstants.START_ELEMENT) {
+          return stream.getLocalName();
+        }
+      }
+
+      return null;
+    } catch (XMLStreamException e) {
+      throw Throwables.propagate(e);
     }
   }
 
@@ -87,7 +124,9 @@ public class XmlParserHelper {
     return new ParseErrorException(message + " in " + file.getAbsolutePath() + " at line " + stream.getLocation().getLineNumber());
   }
 
-  public static void closeXmlStream(XMLStreamReader stream) {
+  public void close() {
+    Closeables.closeQuietly(reader);
+
     if (stream != null) {
       try {
         stream.close();
@@ -95,6 +134,10 @@ public class XmlParserHelper {
         throw Throwables.propagate(e);
       }
     }
+  }
+
+  public XMLStreamReader stream() {
+    return stream;
   }
 
 }

@@ -19,22 +19,11 @@
  */
 package org.sonar.plugins.dotnet.tests;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
-import com.google.common.io.Closeables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Map;
 
 public class NCover3ReportParser implements CoverageParser {
@@ -49,6 +38,7 @@ public class NCover3ReportParser implements CoverageParser {
 
   @Override
   public Coverage parse() {
+    LOG.info("Parsing the NCover3 report " + file.getAbsolutePath());
     return new Parser(file).parse();
   }
 
@@ -64,43 +54,31 @@ public class NCover3ReportParser implements CoverageParser {
     }
 
     public Coverage parse() {
-      LOG.info("Parsing the NCover3 report " + file.getAbsolutePath());
-
-      InputStreamReader reader = null;
-      XMLStreamReader stream = null;
-
       try {
-        reader = new InputStreamReader(new FileInputStream(file), Charsets.UTF_8);
-        XMLInputFactory xmlFactory = XMLInputFactory.newInstance();
-        stream = xmlFactory.createXMLStreamReader(reader);
-        xmlParserHelper = new XmlParserHelper(file, stream);
-
+        xmlParserHelper = new XmlParserHelper(file);
         checkRootTag();
-
-        while (stream.hasNext()) {
-          if (stream.next() == XMLStreamConstants.START_ELEMENT) {
-            String tagName = stream.getLocalName();
-
-            if ("doc".equals(tagName)) {
-              handleDocTag();
-            } else if ("seqpnt".equals(tagName)) {
-              handleSegmentPointTag();
-            }
-          }
-        }
-      } catch (IOException e) {
-        throw Throwables.propagate(e);
-      } catch (XMLStreamException e) {
-        throw Throwables.propagate(e);
+        dispatchTags();
       } finally {
-        XmlParserHelper.closeXmlStream(stream);
-        Closeables.closeQuietly(reader);
+        if (xmlParserHelper != null) {
+          xmlParserHelper.close();
+        }
       }
 
       return coverage;
     }
 
-    private void handleDocTag() throws XMLStreamException {
+    private void dispatchTags() {
+      String tagName;
+      while ((tagName = xmlParserHelper.nextTag()) != null) {
+        if ("doc".equals(tagName)) {
+          handleDocTag();
+        } else if ("seqpnt".equals(tagName)) {
+          handleSegmentPointTag();
+        }
+      }
+    }
+
+    private void handleDocTag() {
       String id = xmlParserHelper.getRequiredAttribute("id");
       String url = xmlParserHelper.getRequiredAttribute("url");
 
@@ -113,7 +91,7 @@ public class NCover3ReportParser implements CoverageParser {
       return "0".equals(id);
     }
 
-    private void handleSegmentPointTag() throws XMLStreamException {
+    private void handleSegmentPointTag() {
       String doc = xmlParserHelper.getRequiredAttribute("doc");
       int line = xmlParserHelper.getRequiredIntAttribute("l");
       int vc = xmlParserHelper.getRequiredIntAttribute("vc");
@@ -127,7 +105,7 @@ public class NCover3ReportParser implements CoverageParser {
       return 0 == line;
     }
 
-    private void checkRootTag() throws XMLStreamException {
+    private void checkRootTag() {
       xmlParserHelper.checkRootTag("coverage");
       xmlParserHelper.checkRequiredAttribute("exportversion", 3);
     }
