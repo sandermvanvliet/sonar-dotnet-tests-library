@@ -104,12 +104,12 @@ public class NCover3ReportParser implements CoverageParser {
         try {
           stream.close();
         } catch (XMLStreamException e) {
-          /* do nothing */
+          throw Throwables.propagate(e);
         }
       }
     }
 
-    private void handleDocTag() throws XMLStreamException, ParseErrorException {
+    private void handleDocTag() throws XMLStreamException {
       String id = getRequiredAttribute("id");
       String url = getRequiredAttribute("url");
 
@@ -122,7 +122,7 @@ public class NCover3ReportParser implements CoverageParser {
       return "0".equals(id);
     }
 
-    private void handleSegmentPointTag() throws XMLStreamException, ParseErrorException {
+    private void handleSegmentPointTag() throws XMLStreamException {
       String doc = getRequiredAttribute("doc");
       int line = getRequiredIntAttribute("l");
       int vc = getRequiredIntAttribute("vc");
@@ -136,7 +136,7 @@ public class NCover3ReportParser implements CoverageParser {
       return 0 == line;
     }
 
-    private int getRequiredIntAttribute(String name) throws ParseErrorException {
+    private int getRequiredIntAttribute(String name) {
       String value = getRequiredAttribute(name);
 
       try {
@@ -146,7 +146,7 @@ public class NCover3ReportParser implements CoverageParser {
       }
     }
 
-    private void checkRootTag() throws XMLStreamException, ParseErrorException {
+    private void checkRootTag() throws XMLStreamException {
       int event = stream.nextTag();
 
       if (event != XMLStreamConstants.START_ELEMENT || !"coverage".equals(stream.getLocalName())) {
@@ -156,7 +156,7 @@ public class NCover3ReportParser implements CoverageParser {
       checkRequiredAttribute("exportversion", 3);
     }
 
-    private void checkRequiredAttribute(String name, int expectedValue) throws ParseErrorException {
+    private void checkRequiredAttribute(String name, int expectedValue) {
       int actualValue = getRequiredIntAttribute(name);
       if (expectedValue != actualValue) {
         throw parseError("Expected \"" + expectedValue + "\" instead of \"" + actualValue + "\" for the \"" + name + "\" attribute");

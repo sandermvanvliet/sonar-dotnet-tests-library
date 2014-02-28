@@ -107,7 +107,7 @@ public class OpenCoverReportParser implements CoverageParser {
         try {
           stream.close();
         } catch (XMLStreamException e) {
-          /* do nothing */
+          throw Throwables.propagate(e);
         }
       }
     }
