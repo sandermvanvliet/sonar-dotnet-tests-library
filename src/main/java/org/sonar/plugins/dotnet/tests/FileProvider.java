@@ -39,7 +39,7 @@ public class FileProvider {
 
   public org.sonar.api.resources.File fromPath(String path) {
     // Workaround SonarQube < 4.2, the context should not be required
-    return context.getResource(org.sonar.api.resources.File.fromIOFile(new File(path), project));
+    return context.getResource(org.sonar.api.resources.File.fromIOFile(new File(new File(path).getAbsolutePath()), project));
   }
 
 }

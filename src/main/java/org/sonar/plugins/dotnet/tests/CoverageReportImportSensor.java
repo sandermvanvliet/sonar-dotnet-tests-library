@@ -58,19 +58,21 @@ public class CoverageReportImportSensor implements Sensor {
     CoverageMeasuresBuilder coverageMeasureBuilder = CoverageMeasuresBuilder.create();
 
     for (String filePath : coverage.files()) {
-      org.sonar.api.resources.File file = fileProvider.fromPath(filePath);
+      org.sonar.api.resources.File sonarFile = fileProvider.fromPath(filePath);
 
-      if (file != null && coverageConf.languageKey().equals(file.getLanguage().getKey())) {
-        coverageMeasureBuilder.reset();
-        for (Map.Entry<Integer, Integer> entry : coverage.hits(filePath).entrySet()) {
-          coverageMeasureBuilder.setHits(entry.getKey(), entry.getValue());
-        }
+      if (sonarFile != null) {
+        if (coverageConf.languageKey().equals(sonarFile.getLanguage().getKey())) {
+          coverageMeasureBuilder.reset();
+          for (Map.Entry<Integer, Integer> entry : coverage.hits(filePath).entrySet()) {
+            coverageMeasureBuilder.setHits(entry.getKey(), entry.getValue());
+          }
 
-        for (Measure measure : coverageMeasureBuilder.createMeasures()) {
-          context.saveMeasure(file, measure);
+          for (Measure measure : coverageMeasureBuilder.createMeasures()) {
+            context.saveMeasure(sonarFile, measure);
+          }
         }
       } else {
-        LOG.debug("Code coverage will not be imported for the following non-indexed file: " + filePath);
+        LOG.info("Code coverage will not be imported for the following file outside of SonarQube: " + filePath);
       }
     }
   }
