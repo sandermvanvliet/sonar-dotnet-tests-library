@@ -27,6 +27,7 @@ import org.junit.rules.ExpectedException;
 import java.io.File;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 public class NCover3ReportParserTest {
 
@@ -37,33 +38,35 @@ public class NCover3ReportParserTest {
   public void invalid_root() {
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("<coverage>");
-    new NCover3ReportParser(new File("src/test/resources/ncover3/invalid_root.nccov")).parse();
+    new NCover3ReportParser().parse(new File("src/test/resources/ncover3/invalid_root.nccov"), mock(Coverage.class));
   }
 
   @Test
   public void wrong_version() {
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("exportversion");
-    new NCover3ReportParser(new File("src/test/resources/ncover3/wrong_version.nccov")).parse();
+    new NCover3ReportParser().parse(new File("src/test/resources/ncover3/wrong_version.nccov"), mock(Coverage.class));
   }
 
   @Test
   public void no_version() {
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("exportversion");
-    new NCover3ReportParser(new File("src/test/resources/ncover3/no_version.nccov")).parse();
+    new NCover3ReportParser().parse(new File("src/test/resources/ncover3/no_version.nccov"), mock(Coverage.class));
   }
 
   @Test
   public void non_existing_file() {
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("non_existing_file.nccov");
-    new NCover3ReportParser(new File("src/test/resources/ncover3/non_existing_file.nccov")).parse();
+    new NCover3ReportParser().parse(new File("src/test/resources/ncover3/non_existing_file.nccov"), mock(Coverage.class));
   }
 
   @Test
   public void valid() {
-    Coverage coverage = new NCover3ReportParser(new File("src/test/resources/ncover3/valid.nccov")).parse();
+    Coverage coverage = new Coverage();
+    new NCover3ReportParser().parse(new File("src/test/resources/ncover3/valid.nccov"), coverage);
+
     assertThat(coverage.files()).containsOnly(
       "MyLibrary\\Adder.cs",
       "MyLibraryNUnitTest\\AdderNUnitTest.cs",

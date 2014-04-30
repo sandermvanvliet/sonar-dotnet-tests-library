@@ -19,8 +19,10 @@
  */
 package org.sonar.plugins.dotnet.tests;
 
+import java.io.File;
+
 public interface CoverageParser {
 
-  Coverage parse();
+  void parse(File file, Coverage coverage);
 
 }

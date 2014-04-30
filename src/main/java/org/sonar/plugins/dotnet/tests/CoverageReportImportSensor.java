@@ -35,26 +35,26 @@ public class CoverageReportImportSensor implements Sensor {
   private static final Logger LOG = LoggerFactory.getLogger(CoverageReportImportSensor.class);
 
   private final CoverageConfiguration coverageConf;
-  private final CoverageParserFactory coverageProviderFactory;
+  private final CoverageAggregator coverageAggregator;
 
-  public CoverageReportImportSensor(CoverageConfiguration coverageConf, CoverageParserFactory coverageProviderFactory) {
+  public CoverageReportImportSensor(CoverageConfiguration coverageConf, CoverageAggregator coverageAggregator) {
     this.coverageConf = coverageConf;
-    this.coverageProviderFactory = coverageProviderFactory;
+    this.coverageAggregator = coverageAggregator;
   }
 
   @Override
   public boolean shouldExecuteOnProject(Project project) {
-    return coverageProviderFactory.hasCoverageProperty();
+    return coverageAggregator.hasCoverageProperty();
   }
 
   @Override
   public void analyse(Project project, SensorContext context) {
-    analyze(context, new FileProvider(project, context));
+    analyze(context, new FileProvider(project, context), new Coverage());
   }
 
   @VisibleForTesting
-  void analyze(SensorContext context, FileProvider fileProvider) {
-    Coverage coverage = coverageProviderFactory.coverageProvider().parse();
+  void analyze(SensorContext context, FileProvider fileProvider, Coverage coverage) {
+    coverageAggregator.aggregate(coverage);
     CoverageMeasuresBuilder coverageMeasureBuilder = CoverageMeasuresBuilder.create();
 
     for (String filePath : coverage.files()) {

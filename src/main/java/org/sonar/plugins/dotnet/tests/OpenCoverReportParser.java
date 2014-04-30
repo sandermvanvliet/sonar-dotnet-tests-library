@@ -30,16 +30,10 @@ public class OpenCoverReportParser implements CoverageParser {
 
   private static final Logger LOG = LoggerFactory.getLogger(OpenCoverReportParser.class);
 
-  private final File file;
-
-  public OpenCoverReportParser(File file) {
-    this.file = file;
-  }
-
   @Override
-  public Coverage parse() {
+  public void parse(File file, Coverage coverage) {
     LOG.info("Parsing the OpenCover report " + file.getAbsolutePath());
-    return new Parser(file).parse();
+    new Parser(file, coverage).parse();
   }
 
   private static class Parser {
@@ -47,11 +41,12 @@ public class OpenCoverReportParser implements CoverageParser {
     private final File file;
     private XmlParserHelper xmlParserHelper;
     private final Map<String, String> files = Maps.newHashMap();
-    private final Coverage coverage = new Coverage();
+    private final Coverage coverage;
     private String fileRef;
 
-    public Parser(File file) {
+    public Parser(File file, Coverage coverage) {
       this.file = file;
+      this.coverage = coverage;
     }
 
     public Coverage parse() {

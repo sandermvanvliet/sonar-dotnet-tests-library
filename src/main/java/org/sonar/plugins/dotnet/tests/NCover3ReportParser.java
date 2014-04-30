@@ -30,16 +30,10 @@ public class NCover3ReportParser implements CoverageParser {
 
   private static final Logger LOG = LoggerFactory.getLogger(NCover3ReportParser.class);
 
-  private final File file;
-
-  public NCover3ReportParser(File file) {
-    this.file = file;
-  }
-
   @Override
-  public Coverage parse() {
+  public void parse(File file, Coverage coverage) {
     LOG.info("Parsing the NCover3 report " + file.getAbsolutePath());
-    return new Parser(file).parse();
+    new Parser(file, coverage).parse();
   }
 
   private static class Parser {
@@ -47,10 +41,11 @@ public class NCover3ReportParser implements CoverageParser {
     private final File file;
     private XmlParserHelper xmlParserHelper;
     private final Map<String, String> documents = Maps.newHashMap();
-    private final Coverage coverage = new Coverage();
+    private final Coverage coverage;
 
-    public Parser(File file) {
+    public Parser(File file, Coverage coverage) {
       this.file = file;
+      this.coverage = coverage;
     }
 
     public Coverage parse() {

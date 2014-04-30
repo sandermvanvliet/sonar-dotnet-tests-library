@@ -27,6 +27,7 @@ import org.junit.rules.ExpectedException;
 import java.io.File;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 public class OpenCoverReportParserTest {
 
@@ -36,32 +37,34 @@ public class OpenCoverReportParserTest {
   @Test
   public void invalid_root() {
     thrown.expectMessage("<CoverageSession>");
-    new OpenCoverReportParser(new File("src/test/resources/opencover/invalid_root.xml")).parse();
+    new OpenCoverReportParser().parse(new File("src/test/resources/opencover/invalid_root.xml"), mock(Coverage.class));
   }
 
   @Test
   public void missing_start_line() {
     thrown.expectMessage("Missing attribute \"sl\" in element <SequencePoint>");
     thrown.expectMessage("missing_start_line.xml at line 27");
-    new OpenCoverReportParser(new File("src/test/resources/opencover/missing_start_line.xml")).parse();
+    new OpenCoverReportParser().parse(new File("src/test/resources/opencover/missing_start_line.xml"), mock(Coverage.class));
   }
 
   @Test
   public void wrong_start_line() {
     thrown.expectMessage("Expected an integer instead of \"foo\" for the attribute \"sl\"");
     thrown.expectMessage("wrong_start_line.xml at line 27");
-    new OpenCoverReportParser(new File("src/test/resources/opencover/wrong_start_line.xml")).parse();
+    new OpenCoverReportParser().parse(new File("src/test/resources/opencover/wrong_start_line.xml"), mock(Coverage.class));
   }
 
   @Test
   public void non_existing_file() {
     thrown.expectMessage("non_existing_file.xml");
-    new OpenCoverReportParser(new File("src/test/resources/opencover/non_existing_file.xml")).parse();
+    new OpenCoverReportParser().parse(new File("src/test/resources/opencover/non_existing_file.xml"), mock(Coverage.class));
   }
 
   @Test
   public void valid() {
-    Coverage coverage = new OpenCoverReportParser(new File("src/test/resources/opencover/valid.xml")).parse();
+    Coverage coverage = new Coverage();
+    new OpenCoverReportParser().parse(new File("src/test/resources/opencover/valid.xml"), coverage);
+
     assertThat(coverage.files()).containsOnly(
       "MyLibraryNUnitTest\\AdderNUnitTest.cs",
       "MyLibrary\\Adder.cs",

@@ -46,7 +46,7 @@ public class CoverageReportImportSensorTest {
     CoverageConfiguration coverageConf = new CoverageConfiguration("", "", "");
     Project project = mock(Project.class);
 
-    CoverageParserFactory coverageFactory = mock(CoverageParserFactory.class);
+    CoverageAggregator coverageFactory = mock(CoverageAggregator.class);
 
     when(coverageFactory.hasCoverageProperty()).thenReturn(true);
     assertThat(new CoverageReportImportSensor(coverageConf, coverageFactory).shouldExecuteOnProject(project)).isTrue();
@@ -70,11 +70,7 @@ public class CoverageReportImportSensorTest {
       .put(42, 1)
       .build());
 
-    CoverageParser coverageProvider = mock(CoverageParser.class);
-    when(coverageProvider.parse()).thenReturn(coverage);
-
-    CoverageParserFactory coverageProviderFactory = mock(CoverageParserFactory.class);
-    when(coverageProviderFactory.coverageProvider()).thenReturn(coverageProvider);
+    CoverageAggregator coverageAggregator = mock(CoverageAggregator.class);
 
     SensorContext context = mock(SensorContext.class);
 
@@ -89,8 +85,9 @@ public class CoverageReportImportSensorTest {
 
     CoverageConfiguration coverageConf = new CoverageConfiguration("cs", "", "");
 
-    new CoverageReportImportSensor(coverageConf, coverageProviderFactory).analyze(context, fileProvider);
+    new CoverageReportImportSensor(coverageConf, coverageAggregator).analyze(context, fileProvider, coverage);
 
+    verify(coverageAggregator).aggregate(coverage);
     verify(context, Mockito.times(3)).saveMeasure(Mockito.any(Resource.class), Mockito.any(Measure.class));
 
     ArgumentCaptor<Measure> captor = ArgumentCaptor.forClass(Measure.class);
