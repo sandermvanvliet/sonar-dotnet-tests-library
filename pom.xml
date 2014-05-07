@@ -37,9 +37,9 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:git:git@github.com:SonarCommunity/sonar-dotnet-tests.git</connection>
-    <developerConnection>scm:git:git@github.com:SonarCommunity/sonar-dotnet-tests.git</developerConnection>
-    <url>https://github.com/SonarCommunity/sonar-dotnet-tests</url>
+    <connection>scm:git:git@github.com:SonarCommunity/sonar-dotnet-tests-library.git</connection>
+    <developerConnection>scm:git:git@github.com:SonarCommunity/sonar-dotnet-tests-library.git</developerConnection>
+    <url>https://github.com/SonarCommunity/sonar-dotnet-tests-library</url>
     <tag>HEAD</tag>
   </scm>
   <issueManagement>
