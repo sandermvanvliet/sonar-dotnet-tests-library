@@ -65,15 +65,21 @@ public class DotCoverReportParser implements CoverageParser {
         throw Throwables.propagate(e);
       }
 
-      String file = extractTitle(contents);
+      String file = extractFile(contents);
       collectCoverage(file, contents);
     }
 
-    private static String extractTitle(String contents) {
+    private static String extractFile(String contents) {
       Matcher matcher = TITLE_PATTERN.matcher(contents);
       checkMatches(matcher);
 
-      return matcher.group(1);
+      String lowerCaseAbsolutePath = matcher.group(1);
+
+      try {
+        return new File(lowerCaseAbsolutePath).getCanonicalPath();
+      } catch (IOException e) {
+        throw Throwables.propagate(e);
+      }
     }
 
     private void collectCoverage(String file, String contents) {

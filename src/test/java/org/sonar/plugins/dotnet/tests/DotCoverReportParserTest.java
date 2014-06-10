@@ -50,14 +50,14 @@ public class DotCoverReportParserTest {
   }
 
   @Test
-  public void valid() {
+  public void valid() throws Exception {
     Coverage coverage = new Coverage();
     new DotCoverReportParser().parse(new File("src/test/resources/dotcover/valid.html"), coverage);
 
     assertThat(coverage.files()).containsOnly(
-      "mylibrary\\calc.cs");
+      new File("mylibrary\\calc.cs").getCanonicalPath());
 
-    assertThat(coverage.hits("mylibrary\\calc.cs"))
+    assertThat(coverage.hits(new File("mylibrary\\calc.cs").getCanonicalPath()))
       .hasSize(16)
       .includes(
         MapAssert.entry(12, 0),
