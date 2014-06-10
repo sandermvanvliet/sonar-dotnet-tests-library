@@ -48,7 +48,7 @@ public class NCover3ReportParser implements CoverageParser {
       this.coverage = coverage;
     }
 
-    public Coverage parse() {
+    public void parse() {
       try {
         xmlParserHelper = new XmlParserHelper(file);
         checkRootTag();
@@ -58,8 +58,6 @@ public class NCover3ReportParser implements CoverageParser {
           xmlParserHelper.close();
         }
       }
-
-      return coverage;
     }
 
     private void dispatchTags() {

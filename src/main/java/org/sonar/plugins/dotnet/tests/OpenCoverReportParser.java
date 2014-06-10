@@ -49,7 +49,7 @@ public class OpenCoverReportParser implements CoverageParser {
       this.coverage = coverage;
     }
 
-    public Coverage parse() {
+    public void parse() {
       try {
         xmlParserHelper = new XmlParserHelper(file);
         xmlParserHelper.checkRootTag("CoverageSession");
@@ -59,8 +59,6 @@ public class OpenCoverReportParser implements CoverageParser {
           xmlParserHelper.close();
         }
       }
-
-      return coverage;
     }
 
     private void dispatchTags() {
