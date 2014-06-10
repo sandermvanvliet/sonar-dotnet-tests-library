@@ -41,66 +41,91 @@ public class CoverageAggregatorTest {
   public void hasCoverageProperty() {
     Settings settings = mock(Settings.class);
 
-    CoverageConfiguration coverageConf = new CoverageConfiguration("", "ncover", "opencover");
+    CoverageConfiguration coverageConf = new CoverageConfiguration("", "ncover", "opencover", "dotcover");
 
     when(settings.hasKey("ncover")).thenReturn(false);
     when(settings.hasKey("opencover")).thenReturn(false);
+    when(settings.hasKey("dotcover")).thenReturn(false);
     assertThat(new CoverageAggregator(coverageConf, settings).hasCoverageProperty()).isFalse();
 
     when(settings.hasKey("ncover")).thenReturn(false);
     when(settings.hasKey("opencover")).thenReturn(true);
+    when(settings.hasKey("dotcover")).thenReturn(false);
     assertThat(new CoverageAggregator(coverageConf, settings).hasCoverageProperty()).isTrue();
 
-    when(settings.hasKey("ncover")).thenReturn(true);
+    when(settings.hasKey("ncover")).thenReturn(false);
     when(settings.hasKey("opencover")).thenReturn(false);
+    when(settings.hasKey("dotcover")).thenReturn(true);
     assertThat(new CoverageAggregator(coverageConf, settings).hasCoverageProperty()).isTrue();
 
     when(settings.hasKey("ncover")).thenReturn(true);
     when(settings.hasKey("opencover")).thenReturn(true);
+    when(settings.hasKey("dotcover")).thenReturn(true);
     assertThat(new CoverageAggregator(coverageConf, settings).hasCoverageProperty()).isTrue();
 
-    coverageConf = new CoverageConfiguration("", "ncover2", "opencover2");
+    coverageConf = new CoverageConfiguration("", "ncover2", "opencover2", "dotcover2");
     when(settings.hasKey("ncover")).thenReturn(true);
     when(settings.hasKey("opencover")).thenReturn(true);
+    when(settings.hasKey("dotcover")).thenReturn(true);
     assertThat(new CoverageAggregator(coverageConf, settings).hasCoverageProperty()).isFalse();
   }
 
   @Test
   public void aggregate() {
-    CoverageConfiguration coverageConf = new CoverageConfiguration("", "ncover", "opencover");
+    CoverageConfiguration coverageConf = new CoverageConfiguration("", "ncover", "opencover", "dotcover");
     Settings settings = mock(Settings.class);
 
     when(settings.hasKey("ncover")).thenReturn(true);
     when(settings.getString("ncover")).thenReturn("foo.nccov");
     when(settings.hasKey("opencover")).thenReturn(false);
+    when(settings.hasKey("dotcover")).thenReturn(false);
     NCover3ReportParser ncoverParser = mock(NCover3ReportParser.class);
     OpenCoverReportParser openCoverParser = mock(OpenCoverReportParser.class);
+    DotCoverReportsAggregator dotCoverParser = mock(DotCoverReportsAggregator.class);
     Coverage coverage = mock(Coverage.class);
-    new CoverageAggregator(coverageConf, settings, ncoverParser, openCoverParser).aggregate(coverage);
+    new CoverageAggregator(coverageConf, settings, ncoverParser, openCoverParser, dotCoverParser).aggregate(coverage);
     verify(ncoverParser).parse(new File("foo.nccov"), coverage);
     verify(openCoverParser, Mockito.never()).parse(Mockito.any(File.class), Mockito.any(Coverage.class));
+    verify(dotCoverParser, Mockito.never()).parse(Mockito.any(File.class), Mockito.any(Coverage.class));
 
     when(settings.hasKey("ncover")).thenReturn(false);
     when(settings.hasKey("opencover")).thenReturn(true);
     when(settings.getString("opencover")).thenReturn("bar.xml");
+    when(settings.hasKey("dotcover")).thenReturn(false);
     ncoverParser = mock(NCover3ReportParser.class);
     openCoverParser = mock(OpenCoverReportParser.class);
     coverage = mock(Coverage.class);
-    new CoverageAggregator(coverageConf, settings, ncoverParser, openCoverParser).aggregate(coverage);
+    new CoverageAggregator(coverageConf, settings, ncoverParser, openCoverParser, dotCoverParser).aggregate(coverage);
     verify(ncoverParser, Mockito.never()).parse(Mockito.any(File.class), Mockito.any(Coverage.class));
     verify(openCoverParser).parse(new File("bar.xml"), coverage);
+    verify(dotCoverParser, Mockito.never()).parse(Mockito.any(File.class), Mockito.any(Coverage.class));
+
+    when(settings.hasKey("ncover")).thenReturn(false);
+    when(settings.hasKey("opencover")).thenReturn(false);
+    when(settings.hasKey("dotcover")).thenReturn(true);
+    when(settings.getString("dotcover")).thenReturn("baz.xml");
+    ncoverParser = mock(NCover3ReportParser.class);
+    openCoverParser = mock(OpenCoverReportParser.class);
+    coverage = mock(Coverage.class);
+    new CoverageAggregator(coverageConf, settings, ncoverParser, openCoverParser, dotCoverParser).aggregate(coverage);
+    verify(ncoverParser, Mockito.never()).parse(Mockito.any(File.class), Mockito.any(Coverage.class));
+    verify(openCoverParser, Mockito.never()).parse(Mockito.any(File.class), Mockito.any(Coverage.class));
+    verify(dotCoverParser).parse(new File("baz.xml"), coverage);
 
     when(settings.hasKey("ncover")).thenReturn(true);
     when(settings.getString("ncover")).thenReturn(",foo.nccov  ,bar.nccov");
     when(settings.hasKey("opencover")).thenReturn(true);
     when(settings.getString("opencover")).thenReturn("bar.xml");
+    when(settings.hasKey("dotcover")).thenReturn(true);
+    when(settings.getString("dotcover")).thenReturn("baz.xml");
     ncoverParser = mock(NCover3ReportParser.class);
     openCoverParser = mock(OpenCoverReportParser.class);
     coverage = mock(Coverage.class);
-    new CoverageAggregator(coverageConf, settings, ncoverParser, openCoverParser).aggregate(coverage);
+    new CoverageAggregator(coverageConf, settings, ncoverParser, openCoverParser, dotCoverParser).aggregate(coverage);
     verify(ncoverParser).parse(new File("foo.nccov"), coverage);
     verify(ncoverParser).parse(new File("bar.nccov"), coverage);
     verify(openCoverParser).parse(new File("bar.xml"), coverage);
+    verify(dotCoverParser).parse(new File("baz.xml"), coverage);
   }
 
 }

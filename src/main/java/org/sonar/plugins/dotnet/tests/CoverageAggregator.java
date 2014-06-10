@@ -32,21 +32,24 @@ public class CoverageAggregator implements BatchExtension {
   private final Settings settings;
   private final NCover3ReportParser ncover3ReportParser;
   private final OpenCoverReportParser openCoverReportParser;
+  private final DotCoverReportsAggregator dotCoverReportsAggregator;
 
   public CoverageAggregator(CoverageConfiguration coverageConf, Settings settings) {
-    this(coverageConf, settings, new NCover3ReportParser(), new OpenCoverReportParser());
+    this(coverageConf, settings, new NCover3ReportParser(), new OpenCoverReportParser(), new DotCoverReportsAggregator(new DotCoverReportParser()));
   }
 
   @VisibleForTesting
-  public CoverageAggregator(CoverageConfiguration coverageConf, Settings settings, NCover3ReportParser ncover3ReportParser, OpenCoverReportParser openCoverReportParser) {
+  public CoverageAggregator(CoverageConfiguration coverageConf, Settings settings,
+    NCover3ReportParser ncover3ReportParser, OpenCoverReportParser openCoverReportParser, DotCoverReportsAggregator dotCoverReportsAggregator) {
     this.coverageConf = coverageConf;
     this.settings = settings;
     this.ncover3ReportParser = ncover3ReportParser;
     this.openCoverReportParser = openCoverReportParser;
+    this.dotCoverReportsAggregator = dotCoverReportsAggregator;
   }
 
   public boolean hasCoverageProperty() {
-    return hasNCover3ReportPaths() || hasOpenCoverReportPaths();
+    return hasNCover3ReportPaths() || hasOpenCoverReportPaths() || hasDotCoverReportPaths();
   }
 
   private boolean hasNCover3ReportPaths() {
@@ -57,6 +60,10 @@ public class CoverageAggregator implements BatchExtension {
     return settings.hasKey(coverageConf.openCoverPropertyKey());
   }
 
+  private boolean hasDotCoverReportPaths() {
+    return settings.hasKey(coverageConf.dotCoverPropertyKey());
+  }
+
   public Coverage aggregate(Coverage coverage) {
     if (hasNCover3ReportPaths()) {
       aggregate(settings.getString(coverageConf.ncover3PropertyKey()), ncover3ReportParser, coverage);
@@ -64,6 +71,10 @@ public class CoverageAggregator implements BatchExtension {
 
     if (hasOpenCoverReportPaths()) {
       aggregate(settings.getString(coverageConf.openCoverPropertyKey()), openCoverReportParser, coverage);
+    }
+
+    if (hasDotCoverReportPaths()) {
+      aggregate(settings.getString(coverageConf.dotCoverPropertyKey()), dotCoverReportsAggregator, coverage);
     }
 
     return coverage;

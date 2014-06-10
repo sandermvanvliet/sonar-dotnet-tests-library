@@ -24,11 +24,13 @@ public class CoverageConfiguration {
   private final String languageKey;
   private final String ncover3PropertyKey;
   private final String openCoverPropertyKey;
+  private final String dotCoverPropertyKey;
 
-  public CoverageConfiguration(String languageKey, String ncover3PropertyKey, String openCoverPropertyKey) {
+  public CoverageConfiguration(String languageKey, String ncover3PropertyKey, String openCoverPropertyKey, String dotCoverPropertyKey) {
     this.languageKey = languageKey;
     this.ncover3PropertyKey = ncover3PropertyKey;
     this.openCoverPropertyKey = openCoverPropertyKey;
+    this.dotCoverPropertyKey = dotCoverPropertyKey;
   }
 
   public String languageKey() {
@@ -41,6 +43,10 @@ public class CoverageConfiguration {
 
   public String openCoverPropertyKey() {
     return openCoverPropertyKey;
+  }
+
+  public String dotCoverPropertyKey() {
+    return dotCoverPropertyKey;
   }
 
 }
