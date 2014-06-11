@@ -19,11 +19,13 @@
  */
 package org.sonar.plugins.dotnet.tests;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 public class NCover3ReportParser implements CoverageParser {
@@ -76,7 +78,11 @@ public class NCover3ReportParser implements CoverageParser {
       String url = xmlParserHelper.getRequiredAttribute("url");
 
       if (!isExcludedId(id)) {
-        documents.put(id, url);
+        try {
+          documents.put(id, new File(url).getCanonicalPath());
+        } catch (IOException e) {
+          throw Throwables.propagate(e);
+        }
       }
     }
 

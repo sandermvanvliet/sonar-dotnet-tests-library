@@ -19,11 +19,13 @@
  */
 package org.sonar.plugins.dotnet.tests;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 public class OpenCoverReportParser implements CoverageParser {
@@ -82,7 +84,11 @@ public class OpenCoverReportParser implements CoverageParser {
       String uid = xmlParserHelper.getRequiredAttribute("uid");
       String fullPath = xmlParserHelper.getRequiredAttribute("fullPath");
 
-      files.put(uid, fullPath);
+      try {
+        files.put(uid, new File(fullPath).getCanonicalPath());
+      } catch (IOException e) {
+        throw Throwables.propagate(e);
+      }
     }
 
     private void handleSegmentPointTag() {

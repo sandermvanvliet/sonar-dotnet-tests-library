@@ -63,17 +63,17 @@ public class NCover3ReportParserTest {
   }
 
   @Test
-  public void valid() {
+  public void valid() throws Exception {
     Coverage coverage = new Coverage();
     new NCover3ReportParser().parse(new File("src/test/resources/ncover3/valid.nccov"), coverage);
 
     assertThat(coverage.files()).containsOnly(
-      "MyLibrary\\Adder.cs",
-      "MyLibraryNUnitTest\\AdderNUnitTest.cs",
-      "MyLibraryTest\\AdderTest.cs",
-      "MyLibraryXUnitTest\\AdderXUnitTest.cs");
+      new File("MyLibrary\\Adder.cs").getCanonicalPath(),
+      new File("MyLibraryNUnitTest\\AdderNUnitTest.cs").getCanonicalPath(),
+      new File("MyLibraryTest\\AdderTest.cs").getCanonicalPath(),
+      new File("MyLibraryXUnitTest\\AdderXUnitTest.cs").getCanonicalPath());
 
-    assertThat(coverage.hits("MyLibrary\\Adder.cs"))
+    assertThat(coverage.hits(new File("MyLibrary\\Adder.cs").getCanonicalPath()))
       .hasSize(11)
       .includes(
         MapAssert.entry(12, 2),

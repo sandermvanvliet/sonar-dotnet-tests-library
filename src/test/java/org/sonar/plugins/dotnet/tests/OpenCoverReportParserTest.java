@@ -61,16 +61,16 @@ public class OpenCoverReportParserTest {
   }
 
   @Test
-  public void valid() {
+  public void valid() throws Exception {
     Coverage coverage = new Coverage();
     new OpenCoverReportParser().parse(new File("src/test/resources/opencover/valid.xml"), coverage);
 
     assertThat(coverage.files()).containsOnly(
-      "MyLibraryNUnitTest\\AdderNUnitTest.cs",
-      "MyLibrary\\Adder.cs",
-      "MyLibrary\\Multiplier.cs");
+      new File("MyLibraryNUnitTest\\AdderNUnitTest.cs").getCanonicalPath(),
+      new File("MyLibrary\\Adder.cs").getCanonicalPath(),
+      new File("MyLibrary\\Multiplier.cs").getCanonicalPath());
 
-    assertThat(coverage.hits("MyLibrary\\Adder.cs"))
+    assertThat(coverage.hits(new File("MyLibrary\\Adder.cs").getCanonicalPath()))
       .hasSize(15)
       .includes(
         MapAssert.entry(11, 2),
@@ -89,7 +89,7 @@ public class OpenCoverReportParserTest {
         MapAssert.entry(36, 2),
         MapAssert.entry(37, 2));
 
-    assertThat(coverage.hits("MyLibrary\\Multiplier.cs"))
+    assertThat(coverage.hits(new File("MyLibrary\\Multiplier.cs").getCanonicalPath()))
       .hasSize(3)
       .includes(
         MapAssert.entry(11, 0),
