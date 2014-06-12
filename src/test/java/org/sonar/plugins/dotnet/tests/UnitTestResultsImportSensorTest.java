@@ -1,0 +1,70 @@
+/*
+ * SonarQube .NET Tests Library
+ * Copyright (C) 2014 SonarSource
+ * dev@sonar.codehaus.org
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ */
+package org.sonar.plugins.dotnet.tests;
+
+import org.junit.Test;
+import org.sonar.api.batch.SensorContext;
+import org.sonar.api.measures.CoreMetrics;
+import org.sonar.api.resources.Project;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+public class UnitTestResultsImportSensorTest {
+
+  @Test
+  public void should_execute_on_project() {
+    Project project = mock(Project.class);
+
+    UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
+
+    when(unitTestResultsAggregator.hasUnitTestResultsProperty()).thenReturn(true);
+    assertThat(new UnitTestResultsImportSensor(unitTestResultsAggregator).shouldExecuteOnProject(project)).isTrue();
+
+    when(unitTestResultsAggregator.hasUnitTestResultsProperty()).thenReturn(false);
+    assertThat(new UnitTestResultsImportSensor(unitTestResultsAggregator).shouldExecuteOnProject(project)).isFalse();
+  }
+
+  @Test
+  public void analyze() {
+    UnitTestResults results = mock(UnitTestResults.class);
+    when(results.tests()).thenReturn(42.0);
+    when(results.passedPercentage()).thenReturn(84.0);
+    when(results.skipped()).thenReturn(1.0);
+    when(results.failed()).thenReturn(2.0);
+    when(results.errors()).thenReturn(3.0);
+
+    UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
+    SensorContext context = mock(SensorContext.class);
+
+    new UnitTestResultsImportSensor(unitTestResultsAggregator).analyze(context, results);
+
+    verify(unitTestResultsAggregator).aggregate(results);
+
+    verify(context).saveMeasure(CoreMetrics.TESTS, 42.0);
+    verify(context).saveMeasure(CoreMetrics.TEST_SUCCESS_DENSITY, 84.0);
+    verify(context).saveMeasure(CoreMetrics.SKIPPED_TESTS, 1.0);
+    verify(context).saveMeasure(CoreMetrics.TEST_FAILURES, 2.0);
+    verify(context).saveMeasure(CoreMetrics.TEST_ERRORS, 3.0);
+  }
+
+}

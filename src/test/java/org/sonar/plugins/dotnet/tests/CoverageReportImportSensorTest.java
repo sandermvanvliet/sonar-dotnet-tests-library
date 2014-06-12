@@ -46,13 +46,13 @@ public class CoverageReportImportSensorTest {
     CoverageConfiguration coverageConf = new CoverageConfiguration("", "", "", "");
     Project project = mock(Project.class);
 
-    CoverageAggregator coverageFactory = mock(CoverageAggregator.class);
+    CoverageAggregator coverageAggregator = mock(CoverageAggregator.class);
 
-    when(coverageFactory.hasCoverageProperty()).thenReturn(true);
-    assertThat(new CoverageReportImportSensor(coverageConf, coverageFactory).shouldExecuteOnProject(project)).isTrue();
+    when(coverageAggregator.hasCoverageProperty()).thenReturn(true);
+    assertThat(new CoverageReportImportSensor(coverageConf, coverageAggregator).shouldExecuteOnProject(project)).isTrue();
 
-    when(coverageFactory.hasCoverageProperty()).thenReturn(false);
-    assertThat(new CoverageReportImportSensor(coverageConf, coverageFactory).shouldExecuteOnProject(project)).isFalse();
+    when(coverageAggregator.hasCoverageProperty()).thenReturn(false);
+    assertThat(new CoverageReportImportSensor(coverageConf, coverageAggregator).shouldExecuteOnProject(project)).isFalse();
   }
 
   @Test
