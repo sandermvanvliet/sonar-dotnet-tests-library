@@ -72,7 +72,7 @@ public class CoverageReportImportSensor implements Sensor {
           }
         }
       } else {
-        LOG.info("Code coverage will not be imported for the following file outside of SonarQube: " + filePath);
+        LOG.debug("Code coverage will not be imported for the following file outside of SonarQube: " + filePath);
       }
     }
   }
