@@ -65,11 +65,11 @@ public class DotCoverReportParser implements CoverageParser {
         throw Throwables.propagate(e);
       }
 
-      String file = extractFile(contents);
-      collectCoverage(file, contents);
+      String fileCanonicalPath = extractFileCanonicalPath(contents);
+      collectCoverage(fileCanonicalPath, contents);
     }
 
-    private static String extractFile(String contents) {
+    private static String extractFileCanonicalPath(String contents) {
       Matcher matcher = TITLE_PATTERN.matcher(contents);
       checkMatches(matcher);
 
@@ -82,7 +82,7 @@ public class DotCoverReportParser implements CoverageParser {
       }
     }
 
-    private void collectCoverage(String file, String contents) {
+    private void collectCoverage(String fileCanonicalPath, String contents) {
       Matcher matcher = COVERED_LINES_PATTERN_1.matcher(contents);
       checkMatches(matcher);
       String highlightedContents = matcher.group(1);
@@ -92,7 +92,7 @@ public class DotCoverReportParser implements CoverageParser {
       while (matcher.find()) {
         int line = Integer.parseInt(matcher.group(1));
         int hits = Integer.parseInt(matcher.group(2));
-        coverage.addHits(file, line, hits);
+        coverage.addHits(fileCanonicalPath, line, hits);
       }
     }
 
