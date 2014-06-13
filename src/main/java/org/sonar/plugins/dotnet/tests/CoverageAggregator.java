@@ -33,23 +33,30 @@ public class CoverageAggregator implements BatchExtension {
   private final NCover3ReportParser ncover3ReportParser;
   private final OpenCoverReportParser openCoverReportParser;
   private final DotCoverReportsAggregator dotCoverReportsAggregator;
+  private final VisualStudioCoverageXmlReportParser visualStudioCoverageXmlReportParser;
 
   public CoverageAggregator(CoverageConfiguration coverageConf, Settings settings) {
-    this(coverageConf, settings, new NCover3ReportParser(), new OpenCoverReportParser(), new DotCoverReportsAggregator(new DotCoverReportParser()));
+    this(coverageConf, settings,
+      new NCover3ReportParser(), new OpenCoverReportParser(), new DotCoverReportsAggregator(new DotCoverReportParser()), new VisualStudioCoverageXmlReportParser());
   }
 
   @VisibleForTesting
   public CoverageAggregator(CoverageConfiguration coverageConf, Settings settings,
-    NCover3ReportParser ncover3ReportParser, OpenCoverReportParser openCoverReportParser, DotCoverReportsAggregator dotCoverReportsAggregator) {
+    NCover3ReportParser ncover3ReportParser,
+    OpenCoverReportParser openCoverReportParser,
+    DotCoverReportsAggregator dotCoverReportsAggregator,
+    VisualStudioCoverageXmlReportParser visualStudioCoverageXmlReportParser) {
+
     this.coverageConf = coverageConf;
     this.settings = settings;
     this.ncover3ReportParser = ncover3ReportParser;
     this.openCoverReportParser = openCoverReportParser;
     this.dotCoverReportsAggregator = dotCoverReportsAggregator;
+    this.visualStudioCoverageXmlReportParser = visualStudioCoverageXmlReportParser;
   }
 
   public boolean hasCoverageProperty() {
-    return hasNCover3ReportPaths() || hasOpenCoverReportPaths() || hasDotCoverReportPaths();
+    return hasNCover3ReportPaths() || hasOpenCoverReportPaths() || hasDotCoverReportPaths() || hasVisualStudioCoverageXmlReportPaths();
   }
 
   private boolean hasNCover3ReportPaths() {
@@ -64,6 +71,10 @@ public class CoverageAggregator implements BatchExtension {
     return settings.hasKey(coverageConf.dotCoverPropertyKey());
   }
 
+  private boolean hasVisualStudioCoverageXmlReportPaths() {
+    return settings.hasKey(coverageConf.visualStudioCoverageXmlPropertyKey());
+  }
+
   public Coverage aggregate(Coverage coverage) {
     if (hasNCover3ReportPaths()) {
       aggregate(settings.getString(coverageConf.ncover3PropertyKey()), ncover3ReportParser, coverage);
@@ -75,6 +86,10 @@ public class CoverageAggregator implements BatchExtension {
 
     if (hasDotCoverReportPaths()) {
       aggregate(settings.getString(coverageConf.dotCoverPropertyKey()), dotCoverReportsAggregator, coverage);
+    }
+
+    if (hasVisualStudioCoverageXmlReportPaths()) {
+      aggregate(settings.getString(coverageConf.visualStudioCoverageXmlPropertyKey()), visualStudioCoverageXmlReportParser, coverage);
     }
 
     return coverage;

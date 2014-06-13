@@ -25,12 +25,14 @@ public class CoverageConfiguration {
   private final String ncover3PropertyKey;
   private final String openCoverPropertyKey;
   private final String dotCoverPropertyKey;
+  private final String visualStudioCoverageXmlPropertyKey;
 
-  public CoverageConfiguration(String languageKey, String ncover3PropertyKey, String openCoverPropertyKey, String dotCoverPropertyKey) {
+  public CoverageConfiguration(String languageKey, String ncover3PropertyKey, String openCoverPropertyKey, String dotCoverPropertyKey, String visualStudioCoverageXmlPropertyKey) {
     this.languageKey = languageKey;
     this.ncover3PropertyKey = ncover3PropertyKey;
     this.openCoverPropertyKey = openCoverPropertyKey;
     this.dotCoverPropertyKey = dotCoverPropertyKey;
+    this.visualStudioCoverageXmlPropertyKey = visualStudioCoverageXmlPropertyKey;
   }
 
   public String languageKey() {
@@ -47,6 +49,10 @@ public class CoverageConfiguration {
 
   public String dotCoverPropertyKey() {
     return dotCoverPropertyKey;
+  }
+
+  public String visualStudioCoverageXmlPropertyKey() {
+    return visualStudioCoverageXmlPropertyKey;
   }
 
 }

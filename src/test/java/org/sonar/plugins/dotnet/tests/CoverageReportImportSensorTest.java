@@ -43,7 +43,7 @@ public class CoverageReportImportSensorTest {
 
   @Test
   public void should_execute_on_project() {
-    CoverageConfiguration coverageConf = new CoverageConfiguration("", "", "", "");
+    CoverageConfiguration coverageConf = new CoverageConfiguration("", "", "", "", "");
     Project project = mock(Project.class);
 
     CoverageAggregator coverageAggregator = mock(CoverageAggregator.class);
@@ -83,7 +83,7 @@ public class CoverageReportImportSensorTest {
     when(fileProvider.fromPath("Bar.cs")).thenReturn(null);
     when(fileProvider.fromPath("Baz.java")).thenReturn(javaSonarFile);
 
-    CoverageConfiguration coverageConf = new CoverageConfiguration("cs", "", "", "");
+    CoverageConfiguration coverageConf = new CoverageConfiguration("cs", "", "", "", "");
 
     new CoverageReportImportSensor(coverageConf, coverageAggregator).analyze(context, fileProvider, coverage);
 
