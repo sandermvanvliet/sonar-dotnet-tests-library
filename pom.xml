@@ -10,7 +10,7 @@
 
   <groupId>org.codehaus.sonar.dotnet.tests</groupId>
   <artifactId>sonar-dotnet-tests-library</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
 
   <name>SonarQube .NET Tests Library</name>
   <description />
@@ -39,7 +39,7 @@
     <connection>scm:git:git@github.com:SonarCommunity/sonar-dotnet-tests-library.git</connection>
     <developerConnection>scm:git:git@github.com:SonarCommunity/sonar-dotnet-tests-library.git</developerConnection>
     <url>https://github.com/SonarCommunity/sonar-dotnet-tests-library</url>
-    <tag>1.1</tag>
+    <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>JIRA</system>
