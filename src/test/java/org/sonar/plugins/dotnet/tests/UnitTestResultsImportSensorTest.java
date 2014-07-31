@@ -19,9 +19,13 @@
  */
 package org.sonar.plugins.dotnet.tests;
 
+import com.google.common.collect.ImmutableList;
+import edu.emory.mathcs.backport.java.util.Collections;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.measures.CoreMetrics;
+import org.sonar.api.measures.Metric;
 import org.sonar.api.resources.Project;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -65,6 +69,47 @@ public class UnitTestResultsImportSensorTest {
     verify(context).saveMeasure(CoreMetrics.SKIPPED_TESTS, 1.0);
     verify(context).saveMeasure(CoreMetrics.TEST_FAILURES, 2.0);
     verify(context).saveMeasure(CoreMetrics.TEST_ERRORS, 3.0);
+  }
+
+  @Test
+  public void should_not_analyze_on_reactor_project() {
+    Project project = mock(Project.class);
+    when(project.isRoot()).thenReturn(true);
+    when(project.getModules()).thenReturn(ImmutableList.of(mock(Project.class)));
+
+    SensorContext context = mock(SensorContext.class);
+
+    UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
+    new UnitTestResultsImportSensor(unitTestResultsAggregator).analyse(project, context);
+
+    verify(context, Mockito.never()).saveMeasure(Mockito.any(Metric.class), Mockito.anyDouble());
+  }
+
+  @Test
+  public void should_analyze_on_multi_module_modules() {
+    Project project = mock(Project.class);
+    when(project.isRoot()).thenReturn(false);
+
+    SensorContext context = mock(SensorContext.class);
+
+    UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
+    new UnitTestResultsImportSensor(unitTestResultsAggregator).analyse(project, context);
+
+    verify(context, Mockito.atLeastOnce()).saveMeasure(Mockito.any(Metric.class), Mockito.anyDouble());
+  }
+
+  @Test
+  public void should_analyze_on_non_multi_module_project() {
+    Project project = mock(Project.class);
+    when(project.isRoot()).thenReturn(true);
+    when(project.getModules()).thenReturn(Collections.emptyList());
+
+    SensorContext context = mock(SensorContext.class);
+
+    UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
+    new UnitTestResultsImportSensor(unitTestResultsAggregator).analyse(project, context);
+
+    verify(context, Mockito.atLeastOnce()).saveMeasure(Mockito.any(Metric.class), Mockito.anyDouble());
   }
 
 }

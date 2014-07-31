@@ -40,7 +40,13 @@ public class UnitTestResultsImportSensor implements Sensor {
 
   @Override
   public void analyse(Project project, SensorContext context) {
-    analyze(context, new UnitTestResults());
+    if (!isReactorProject(project)) {
+      analyze(context, new UnitTestResults());
+    }
+  }
+
+  private static boolean isReactorProject(Project project) {
+    return project.isRoot() && !project.getModules().isEmpty();
   }
 
   @VisibleForTesting
