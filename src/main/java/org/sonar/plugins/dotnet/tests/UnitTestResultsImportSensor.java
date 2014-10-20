@@ -47,13 +47,15 @@ public class UnitTestResultsImportSensor implements Sensor {
 
   @VisibleForTesting
   void analyze(SensorContext context, UnitTestResults unitTestResults) {
-    unitTestResultsAggregator.aggregate(unitTestResults);
+    UnitTestResults aggregatedResults = unitTestResultsAggregator.aggregate(unitTestResults);
 
-    context.saveMeasure(CoreMetrics.TESTS, unitTestResults.tests());
-    context.saveMeasure(CoreMetrics.TEST_SUCCESS_DENSITY, unitTestResults.passedPercentage());
-    context.saveMeasure(CoreMetrics.TEST_ERRORS, unitTestResults.errors());
-    context.saveMeasure(CoreMetrics.TEST_FAILURES, unitTestResults.failed());
-    context.saveMeasure(CoreMetrics.SKIPPED_TESTS, unitTestResults.skipped());
+    if (aggregatedResults.tests() > 0.0) {
+      context.saveMeasure(CoreMetrics.TESTS, aggregatedResults.tests());
+      context.saveMeasure(CoreMetrics.TEST_SUCCESS_DENSITY, aggregatedResults.passedPercentage());
+      context.saveMeasure(CoreMetrics.TEST_ERRORS, aggregatedResults.errors());
+      context.saveMeasure(CoreMetrics.TEST_FAILURES, aggregatedResults.failed());
+      context.saveMeasure(CoreMetrics.SKIPPED_TESTS, aggregatedResults.skipped());
+    }
   }
 
 }

@@ -60,6 +60,8 @@ public class UnitTestResultsImportSensorTest {
     UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
     SensorContext context = mock(SensorContext.class);
 
+    when(unitTestResultsAggregator.aggregate(Mockito.any(UnitTestResults.class))).thenReturn(results);
+
     new UnitTestResultsImportSensor(unitTestResultsAggregator).analyze(context, results);
 
     verify(unitTestResultsAggregator).aggregate(results);
@@ -72,6 +74,21 @@ public class UnitTestResultsImportSensorTest {
   }
 
   @Test
+  public void should_not_save_metrics_with_empty_results() {
+    SensorContext context = mock(SensorContext.class);
+
+    UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
+    UnitTestResults results = mock(UnitTestResults.class);
+    when(results.tests()).thenReturn(0.0);
+    when(unitTestResultsAggregator.aggregate(Mockito.any(UnitTestResults.class))).thenReturn(results);
+
+    new UnitTestResultsImportSensor(unitTestResultsAggregator).analyze(context, results);
+
+    verify(unitTestResultsAggregator).aggregate(results);
+    verify(context, Mockito.never()).saveMeasure(Mockito.any(Metric.class), Mockito.anyDouble());
+  }
+
+  @Test
   public void should_analyze_on_reactor_project() {
     Project project = mock(Project.class);
     when(project.isRoot()).thenReturn(true);
@@ -80,6 +97,10 @@ public class UnitTestResultsImportSensorTest {
     SensorContext context = mock(SensorContext.class);
 
     UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
+    UnitTestResults results = mock(UnitTestResults.class);
+    when(results.tests()).thenReturn(1.0);
+    when(unitTestResultsAggregator.aggregate(Mockito.any(UnitTestResults.class))).thenReturn(results);
+
     new UnitTestResultsImportSensor(unitTestResultsAggregator).analyse(project, context);
 
     verify(context, Mockito.atLeastOnce()).saveMeasure(Mockito.any(Metric.class), Mockito.anyDouble());
@@ -93,6 +114,10 @@ public class UnitTestResultsImportSensorTest {
     SensorContext context = mock(SensorContext.class);
 
     UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
+    UnitTestResults results = mock(UnitTestResults.class);
+    when(results.tests()).thenReturn(1.0);
+    when(unitTestResultsAggregator.aggregate(Mockito.any(UnitTestResults.class))).thenReturn(results);
+
     new UnitTestResultsImportSensor(unitTestResultsAggregator).analyse(project, context);
 
     verify(context, Mockito.never()).saveMeasure(Mockito.any(Metric.class), Mockito.anyDouble());
@@ -107,6 +132,10 @@ public class UnitTestResultsImportSensorTest {
     SensorContext context = mock(SensorContext.class);
 
     UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
+    UnitTestResults results = mock(UnitTestResults.class);
+    when(results.tests()).thenReturn(1.0);
+    when(unitTestResultsAggregator.aggregate(Mockito.any(UnitTestResults.class))).thenReturn(results);
+
     new UnitTestResultsImportSensor(unitTestResultsAggregator).analyse(project, context);
 
     verify(context, Mockito.atLeastOnce()).saveMeasure(Mockito.any(Metric.class), Mockito.anyDouble());
