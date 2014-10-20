@@ -72,7 +72,7 @@ public class UnitTestResultsImportSensorTest {
   }
 
   @Test
-  public void should_not_analyze_on_reactor_project() {
+  public void should_analyze_on_reactor_project() {
     Project project = mock(Project.class);
     when(project.isRoot()).thenReturn(true);
     when(project.getModules()).thenReturn(ImmutableList.of(mock(Project.class)));
@@ -82,11 +82,11 @@ public class UnitTestResultsImportSensorTest {
     UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
     new UnitTestResultsImportSensor(unitTestResultsAggregator).analyse(project, context);
 
-    verify(context, Mockito.never()).saveMeasure(Mockito.any(Metric.class), Mockito.anyDouble());
+    verify(context, Mockito.atLeastOnce()).saveMeasure(Mockito.any(Metric.class), Mockito.anyDouble());
   }
 
   @Test
-  public void should_analyze_on_multi_module_modules() {
+  public void should_not_analyze_on_multi_module_modules() {
     Project project = mock(Project.class);
     when(project.isRoot()).thenReturn(false);
 
@@ -95,7 +95,7 @@ public class UnitTestResultsImportSensorTest {
     UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
     new UnitTestResultsImportSensor(unitTestResultsAggregator).analyse(project, context);
 
-    verify(context, Mockito.atLeastOnce()).saveMeasure(Mockito.any(Metric.class), Mockito.anyDouble());
+    verify(context, Mockito.never()).saveMeasure(Mockito.any(Metric.class), Mockito.anyDouble());
   }
 
   @Test
