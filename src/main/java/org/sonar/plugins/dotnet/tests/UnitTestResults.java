@@ -40,12 +40,7 @@ public class UnitTestResults {
   }
 
   public double passedPercentage() {
-	if(tests == 0) {
-		return 0;
-	}
-	else {
-		return passed * 100.0 / tests;
-	}
+    return passed * 100.0 / tests;
   }
 
   public double skipped() {
