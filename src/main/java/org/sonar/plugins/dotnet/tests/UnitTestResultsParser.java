@@ -19,22 +19,10 @@
  */
 package org.sonar.plugins.dotnet.tests;
 
-public class UnitTestConfiguration {
+import java.io.File;
 
-  private final String visualStudioTestResultsFilePropertyKey;
-  private final String nunitTestResultsFilePropertyKey;
+public interface UnitTestResultsParser {
 
-  public UnitTestConfiguration(String visualStudioTestResultsFilePropertyKey, String nunitTestResultsFilePropertyKey) {
-    this.visualStudioTestResultsFilePropertyKey = visualStudioTestResultsFilePropertyKey;
-    this.nunitTestResultsFilePropertyKey = nunitTestResultsFilePropertyKey;
-  }
-
-  public String visualStudioTestResultsFilePropertyKey() {
-    return visualStudioTestResultsFilePropertyKey;
-  }
-
-  public String nunitTestResultsFilePropertyKey() {
-    return nunitTestResultsFilePropertyKey;
-  }
+  void parse(File file, UnitTestResults unitTestResults);
 
 }
