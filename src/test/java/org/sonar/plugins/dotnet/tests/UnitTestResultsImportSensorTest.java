@@ -54,7 +54,7 @@ public class UnitTestResultsImportSensorTest {
     when(results.tests()).thenReturn(42.0);
     when(results.passedPercentage()).thenReturn(84.0);
     when(results.skipped()).thenReturn(1.0);
-    when(results.failed()).thenReturn(2.0);
+    when(results.failures()).thenReturn(2.0);
     when(results.errors()).thenReturn(3.0);
 
     UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
@@ -80,12 +80,19 @@ public class UnitTestResultsImportSensorTest {
     UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
     UnitTestResults results = mock(UnitTestResults.class);
     when(results.tests()).thenReturn(0.0);
+    when(results.skipped()).thenReturn(1.0);
+    when(results.failures()).thenReturn(2.0);
+    when(results.errors()).thenReturn(3.0);
     when(unitTestResultsAggregator.aggregate(Mockito.any(UnitTestResults.class))).thenReturn(results);
 
     new UnitTestResultsImportSensor(unitTestResultsAggregator).analyze(context, results);
 
     verify(unitTestResultsAggregator).aggregate(results);
-    verify(context, Mockito.never()).saveMeasure(Mockito.any(Metric.class), Mockito.anyDouble());
+    verify(context).saveMeasure(CoreMetrics.TESTS, 0.0);
+    verify(context).saveMeasure(CoreMetrics.SKIPPED_TESTS, 1.0);
+    verify(context).saveMeasure(CoreMetrics.TEST_FAILURES, 2.0);
+    verify(context).saveMeasure(CoreMetrics.TEST_ERRORS, 3.0);
+    verify(context, Mockito.never()).saveMeasure(Mockito.eq(CoreMetrics.TEST_SUCCESS_DENSITY), Mockito.anyDouble());
   }
 
   @Test

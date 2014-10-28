@@ -54,10 +54,10 @@ public class NUnitTestResultsFileParserTest {
     UnitTestResults results = new UnitTestResults();
     new NUnitTestResultsFileParser().parse(new File("src/test/resources/nunit/valid.xml"), results);
 
-    assertThat(results.tests()).isEqualTo(203);
-    assertThat(results.passedPercentage()).isEqualTo(150 / 200.0 * 100);
-    assertThat(results.skipped()).isEqualTo(3);
-    assertThat(results.failed()).isEqualTo(20);
+    assertThat(results.tests()).isEqualTo(196);
+    assertThat(results.passedPercentage()).isEqualTo(146 * 100.0 / 196);
+    assertThat(results.skipped()).isEqualTo(7);
+    assertThat(results.failures()).isEqualTo(20);
     assertThat(results.errors()).isEqualTo(30);
   }
 

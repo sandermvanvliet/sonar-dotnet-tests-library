@@ -65,11 +65,14 @@ public class NUnitTestResultsFileParser implements UnitTestResultsParser {
       int total = xmlParserHelper.getRequiredIntAttribute("total");
       int errors = xmlParserHelper.getRequiredIntAttribute("errors");
       int failures = xmlParserHelper.getRequiredIntAttribute("failures");
+      int inconclusive = xmlParserHelper.getRequiredIntAttribute("inconclusive");
       int ignored = xmlParserHelper.getRequiredIntAttribute("ignored");
 
-      int passed = total - errors - failures;
+      int tests = total - inconclusive;
+      int passed = total - errors - failures - inconclusive;
+      int skipped = inconclusive + ignored;
 
-      unitTestResults.add(total + ignored, passed, ignored, failures, errors);
+      unitTestResults.add(tests, passed, skipped, failures, errors);
     }
   }
 

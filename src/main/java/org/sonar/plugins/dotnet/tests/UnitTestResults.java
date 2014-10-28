@@ -24,14 +24,14 @@ public class UnitTestResults {
   private int tests;
   private int passed;
   private int skipped;
-  private int failed;
+  private int failures;
   private int errors;
 
-  public void add(int tests, int passed, int skipped, int failed, int errors) {
+  public void add(int tests, int passed, int skipped, int failures, int errors) {
     this.tests += tests;
     this.passed += passed;
     this.skipped += skipped;
-    this.failed += failed;
+    this.failures += failures;
     this.errors += errors;
   }
 
@@ -40,15 +40,15 @@ public class UnitTestResults {
   }
 
   public double passedPercentage() {
-    return passed * 100.0 / (tests() - skipped());
+    return passed * 100.0 / tests();
   }
 
   public double skipped() {
     return skipped;
   }
 
-  public double failed() {
-    return failed;
+  public double failures() {
+    return failures;
   }
 
   public double errors() {

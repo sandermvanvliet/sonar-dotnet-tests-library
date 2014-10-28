@@ -72,15 +72,20 @@ public class VisualStudioTestResultsFileParser implements UnitTestResultsParser 
 
     private void handleCountersTag() {
       foundCounters = true;
-      int errors = xmlParserHelper.getRequiredIntAttribute("error");
+
+      int passed = xmlParserHelper.getRequiredIntAttribute("passed");
       int failed = xmlParserHelper.getRequiredIntAttribute("failed");
+      int errors = xmlParserHelper.getRequiredIntAttribute("error");
       int timeout = xmlParserHelper.getRequiredIntAttribute("timeout");
       int aborted = xmlParserHelper.getRequiredIntAttribute("aborted");
-      int inconclusive = xmlParserHelper.getRequiredIntAttribute("inconclusive");
-      int executed = xmlParserHelper.getRequiredIntAttribute("executed");
-      int passed = xmlParserHelper.getRequiredIntAttribute("passed");
 
-      unitTestResults.add(executed, passed, aborted + inconclusive, timeout + failed, errors);
+      int inconclusive = xmlParserHelper.getRequiredIntAttribute("inconclusive");
+
+      int tests = passed + failed + errors + timeout + aborted;
+      int skipped = inconclusive;
+      int failures = timeout + failed + aborted;
+
+      unitTestResults.add(tests, passed, skipped, failures, errors);
     }
 
     private void checkRootTag() {
