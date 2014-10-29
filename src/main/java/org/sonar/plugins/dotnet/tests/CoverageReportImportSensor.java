@@ -28,12 +28,14 @@ import org.sonar.api.measures.CoverageMeasuresBuilder;
 import org.sonar.api.measures.Measure;
 import org.sonar.api.resources.Project;
 
+import java.io.File;
 import java.util.Map;
 
 public class CoverageReportImportSensor implements Sensor {
 
   private static final Logger LOG = LoggerFactory.getLogger(CoverageReportImportSensor.class);
 
+  private final WildcardPatternFileProvider wildcardPatternFileProvider = new WildcardPatternFileProvider(new File("."), File.separator);
   private final CoverageConfiguration coverageConf;
   private final CoverageAggregator coverageAggregator;
 
@@ -54,7 +56,7 @@ public class CoverageReportImportSensor implements Sensor {
 
   @VisibleForTesting
   void analyze(SensorContext context, FileProvider fileProvider, Coverage coverage) {
-    coverageAggregator.aggregate(coverage);
+    coverageAggregator.aggregate(wildcardPatternFileProvider, coverage);
     CoverageMeasuresBuilder coverageMeasureBuilder = CoverageMeasuresBuilder.create();
 
     for (String filePath : coverage.files()) {

@@ -60,11 +60,11 @@ public class UnitTestResultsImportSensorTest {
     UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
     SensorContext context = mock(SensorContext.class);
 
-    when(unitTestResultsAggregator.aggregate(Mockito.any(UnitTestResults.class))).thenReturn(results);
+    when(unitTestResultsAggregator.aggregate(Mockito.any(WildcardPatternFileProvider.class), Mockito.any(UnitTestResults.class))).thenReturn(results);
 
     new UnitTestResultsImportSensor(unitTestResultsAggregator).analyze(context, results);
 
-    verify(unitTestResultsAggregator).aggregate(results);
+    verify(unitTestResultsAggregator).aggregate(Mockito.any(WildcardPatternFileProvider.class), Mockito.eq(results));
 
     verify(context).saveMeasure(CoreMetrics.TESTS, 42.0);
     verify(context).saveMeasure(CoreMetrics.TEST_SUCCESS_DENSITY, 84.0);
@@ -83,11 +83,11 @@ public class UnitTestResultsImportSensorTest {
     when(results.skipped()).thenReturn(1.0);
     when(results.failures()).thenReturn(2.0);
     when(results.errors()).thenReturn(3.0);
-    when(unitTestResultsAggregator.aggregate(Mockito.any(UnitTestResults.class))).thenReturn(results);
+    when(unitTestResultsAggregator.aggregate(Mockito.any(WildcardPatternFileProvider.class), Mockito.any(UnitTestResults.class))).thenReturn(results);
 
     new UnitTestResultsImportSensor(unitTestResultsAggregator).analyze(context, results);
 
-    verify(unitTestResultsAggregator).aggregate(results);
+    verify(unitTestResultsAggregator).aggregate(Mockito.any(WildcardPatternFileProvider.class), Mockito.eq(results));
     verify(context).saveMeasure(CoreMetrics.TESTS, 0.0);
     verify(context).saveMeasure(CoreMetrics.SKIPPED_TESTS, 1.0);
     verify(context).saveMeasure(CoreMetrics.TEST_FAILURES, 2.0);
@@ -106,7 +106,7 @@ public class UnitTestResultsImportSensorTest {
     UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
     UnitTestResults results = mock(UnitTestResults.class);
     when(results.tests()).thenReturn(1.0);
-    when(unitTestResultsAggregator.aggregate(Mockito.any(UnitTestResults.class))).thenReturn(results);
+    when(unitTestResultsAggregator.aggregate(Mockito.any(WildcardPatternFileProvider.class), Mockito.any(UnitTestResults.class))).thenReturn(results);
 
     new UnitTestResultsImportSensor(unitTestResultsAggregator).analyse(project, context);
 
@@ -123,7 +123,7 @@ public class UnitTestResultsImportSensorTest {
     UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
     UnitTestResults results = mock(UnitTestResults.class);
     when(results.tests()).thenReturn(1.0);
-    when(unitTestResultsAggregator.aggregate(Mockito.any(UnitTestResults.class))).thenReturn(results);
+    when(unitTestResultsAggregator.aggregate(Mockito.any(WildcardPatternFileProvider.class), Mockito.any(UnitTestResults.class))).thenReturn(results);
 
     new UnitTestResultsImportSensor(unitTestResultsAggregator).analyse(project, context);
 
@@ -141,7 +141,7 @@ public class UnitTestResultsImportSensorTest {
     UnitTestResultsAggregator unitTestResultsAggregator = mock(UnitTestResultsAggregator.class);
     UnitTestResults results = mock(UnitTestResults.class);
     when(results.tests()).thenReturn(1.0);
-    when(unitTestResultsAggregator.aggregate(Mockito.any(UnitTestResults.class))).thenReturn(results);
+    when(unitTestResultsAggregator.aggregate(Mockito.any(WildcardPatternFileProvider.class), Mockito.any(UnitTestResults.class))).thenReturn(results);
 
     new UnitTestResultsImportSensor(unitTestResultsAggregator).analyse(project, context);
 

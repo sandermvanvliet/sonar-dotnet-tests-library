@@ -75,29 +75,31 @@ public class CoverageAggregator implements BatchExtension {
     return settings.hasKey(coverageConf.visualStudioCoverageXmlPropertyKey());
   }
 
-  public Coverage aggregate(Coverage coverage) {
+  public Coverage aggregate(WildcardPatternFileProvider wildcardPatternFileProvider, Coverage coverage) {
     if (hasNCover3ReportPaths()) {
-      aggregate(settings.getString(coverageConf.ncover3PropertyKey()), ncover3ReportParser, coverage);
+      aggregate(wildcardPatternFileProvider, settings.getString(coverageConf.ncover3PropertyKey()), ncover3ReportParser, coverage);
     }
 
     if (hasOpenCoverReportPaths()) {
-      aggregate(settings.getString(coverageConf.openCoverPropertyKey()), openCoverReportParser, coverage);
+      aggregate(wildcardPatternFileProvider, settings.getString(coverageConf.openCoverPropertyKey()), openCoverReportParser, coverage);
     }
 
     if (hasDotCoverReportPaths()) {
-      aggregate(settings.getString(coverageConf.dotCoverPropertyKey()), dotCoverReportsAggregator, coverage);
+      aggregate(wildcardPatternFileProvider, settings.getString(coverageConf.dotCoverPropertyKey()), dotCoverReportsAggregator, coverage);
     }
 
     if (hasVisualStudioCoverageXmlReportPaths()) {
-      aggregate(settings.getString(coverageConf.visualStudioCoverageXmlPropertyKey()), visualStudioCoverageXmlReportParser, coverage);
+      aggregate(wildcardPatternFileProvider, settings.getString(coverageConf.visualStudioCoverageXmlPropertyKey()), visualStudioCoverageXmlReportParser, coverage);
     }
 
     return coverage;
   }
 
-  private static void aggregate(String reportPaths, CoverageParser parser, Coverage coverage) {
-    for (String reportPath : Splitter.on(',').trimResults().omitEmptyStrings().split(reportPaths)) {
-      parser.parse(new File(reportPath), coverage);
+  private void aggregate(WildcardPatternFileProvider wildcardPatternFileProvider, String reportPaths, CoverageParser parser, Coverage coverage) {
+    for (String reportPathPattern : Splitter.on(',').trimResults().omitEmptyStrings().split(reportPaths)) {
+      for (File reportFile : wildcardPatternFileProvider.listFiles(reportPathPattern)) {
+        parser.parse(reportFile, coverage);
+      }
     }
   }
 

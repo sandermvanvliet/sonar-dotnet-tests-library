@@ -87,7 +87,7 @@ public class CoverageReportImportSensorTest {
 
     new CoverageReportImportSensor(coverageConf, coverageAggregator).analyze(context, fileProvider, coverage);
 
-    verify(coverageAggregator).aggregate(coverage);
+    verify(coverageAggregator).aggregate(Mockito.any(WildcardPatternFileProvider.class), Mockito.eq(coverage));
     verify(context, Mockito.times(3)).saveMeasure(Mockito.any(Resource.class), Mockito.any(Measure.class));
 
     ArgumentCaptor<Measure> captor = ArgumentCaptor.forClass(Measure.class);

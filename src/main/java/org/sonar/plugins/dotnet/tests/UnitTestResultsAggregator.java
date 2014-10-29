@@ -59,21 +59,23 @@ public class UnitTestResultsAggregator implements BatchExtension {
     return settings.hasKey(unitTestConf.nunitTestResultsFilePropertyKey());
   }
 
-  public UnitTestResults aggregate(UnitTestResults unitTestResults) {
+  public UnitTestResults aggregate(WildcardPatternFileProvider wildcardPatternFileProvider, UnitTestResults unitTestResults) {
     if (hasVisualStudioTestResultsFile()) {
-      aggregate(settings.getString(unitTestConf.visualStudioTestResultsFilePropertyKey()), visualStudioTestResultsFileParser, unitTestResults);
+      aggregate(wildcardPatternFileProvider, settings.getString(unitTestConf.visualStudioTestResultsFilePropertyKey()), visualStudioTestResultsFileParser, unitTestResults);
     }
 
     if (hasNUnitTestResultsFile()) {
-      aggregate(settings.getString(unitTestConf.nunitTestResultsFilePropertyKey()), nunitTestResultsFileParser, unitTestResults);
+      aggregate(wildcardPatternFileProvider, settings.getString(unitTestConf.nunitTestResultsFilePropertyKey()), nunitTestResultsFileParser, unitTestResults);
     }
 
     return unitTestResults;
   }
 
-  private static void aggregate(String reportPaths, UnitTestResultsParser parser, UnitTestResults unitTestResults) {
-    for (String reportPath : Splitter.on(',').trimResults().omitEmptyStrings().split(reportPaths)) {
-      parser.parse(new File(reportPath), unitTestResults);
+  private void aggregate(WildcardPatternFileProvider wildcardPatternFileProvider, String reportPaths, UnitTestResultsParser parser, UnitTestResults unitTestResults) {
+    for (String reportPathPattern : Splitter.on(',').trimResults().omitEmptyStrings().split(reportPaths)) {
+      for (File reportFile : wildcardPatternFileProvider.listFiles(reportPathPattern)) {
+        parser.parse(reportFile, unitTestResults);
+      }
     }
   }
 
