@@ -50,7 +50,7 @@ public class WildcardPatternFileProvider {
     List<String> elements = ImmutableList.copyOf(Splitter.on(directorySeparator).split(pattern));
 
     List<String> elementsTillFirstWildcard = elementsTillFirstWildcard(elements);
-    String pathTillFirstWildcardElement = joinElements(elementsTillFirstWildcard);
+    String pathTillFirstWildcardElement = toPath(elementsTillFirstWildcard);
     File fileTillFirstWildcardElement = new File(pathTillFirstWildcardElement);
 
     File absoluteFileTillFirstWildcardElement = fileTillFirstWildcardElement.isAbsolute() ? fileTillFirstWildcardElement : new File(baseDir, pathTillFirstWildcardElement);
@@ -61,7 +61,7 @@ public class WildcardPatternFileProvider {
     }
     checkNoCurrentOrParentFolderAccess(wildcardElements);
 
-    WildcardPattern wildcardPattern = WildcardPattern.create(joinElements(wildcardElements), directorySeparator);
+    WildcardPattern wildcardPattern = WildcardPattern.create(toPath(wildcardElements), directorySeparator);
 
     ImmutableSet.Builder<File> builder = ImmutableSet.builder();
     for (File file : listFiles(absoluteFileTillFirstWildcardElement)) {
@@ -75,7 +75,7 @@ public class WildcardPatternFileProvider {
     return builder.build();
   }
 
-  private String joinElements(List<String> elements) {
+  private String toPath(List<String> elements) {
     return Joiner.on(directorySeparator).join(elements);
   }
 
