@@ -80,7 +80,8 @@ public class NCover3ReportParser implements CoverageParser {
         try {
           documents.put(id, new File(url).getCanonicalPath());
         } catch (IOException e) {
-          LOG.debug("Skipping the import of NCover3 code coverage for the invalid file path: " + url + " at line " + xmlParserHelper.stream().getLocation().getLineNumber());
+          LOG.debug("Skipping the import of NCover3 code coverage for the invalid file path: " + url
+            + " at line " + xmlParserHelper.stream().getLocation().getLineNumber(), e);
         }
       }
     }
