@@ -49,35 +49,23 @@ public class WildcardPatternFileProvider {
   public Set<File> listFiles(String pattern) {
     List<String> elements = ImmutableList.copyOf(Splitter.on(directorySeparator).split(pattern));
 
-    int lastElementWithoutWildcard = 0;
-    for (String element : elements) {
-      if (containsWildcard(element)) {
-        break;
-      }
-      lastElementWithoutWildcard++;
-    }
-
-    String pathTillFirstWildcardElement = Joiner.on(directorySeparator).join(elements.subList(0, lastElementWithoutWildcard));
+    List<String> elementsTillFirstWildcard = elementsTillFirstWildcard(elements);
+    String pathTillFirstWildcardElement = joinElements(elementsTillFirstWildcard);
     File fileTillFirstWildcardElement = new File(pathTillFirstWildcardElement);
 
-    File startDir = fileTillFirstWildcardElement.isAbsolute() ? fileTillFirstWildcardElement : new File(baseDir, pathTillFirstWildcardElement);
+    File absoluteFileTillFirstWildcardElement = fileTillFirstWildcardElement.isAbsolute() ? fileTillFirstWildcardElement : new File(baseDir, pathTillFirstWildcardElement);
 
-    List<String> wildcardElements = elements.subList(lastElementWithoutWildcard, elements.size());
+    List<String> wildcardElements = elements.subList(elementsTillFirstWildcard.size(), elements.size());
     if (wildcardElements.isEmpty()) {
-      return startDir.exists() ? ImmutableSet.of(startDir) : ImmutableSet.<File>of();
+      return absoluteFileTillFirstWildcardElement.exists() ? ImmutableSet.of(absoluteFileTillFirstWildcardElement) : ImmutableSet.<File>of();
     }
+    checkNoCurrentOrParentFolderAccess(wildcardElements);
 
-    for (String wildcardElement : wildcardElements) {
-      if (isCurrentOrParentFolder(wildcardElement)) {
-        throw new IllegalArgumentException("Cannot contain '" + CURRENT_FOLDER + "' or '" + PARENT_FOLDER + "' after the first wildcard.");
-      }
-    }
-
-    WildcardPattern wildcardPattern = WildcardPattern.create(Joiner.on(directorySeparator).join(wildcardElements), directorySeparator);
+    WildcardPattern wildcardPattern = WildcardPattern.create(joinElements(wildcardElements), directorySeparator);
 
     ImmutableSet.Builder<File> builder = ImmutableSet.builder();
-    for (File file : listFiles(startDir)) {
-      String relativePath = relativize(startDir, file);
+    for (File file : listFiles(absoluteFileTillFirstWildcardElement)) {
+      String relativePath = relativize(absoluteFileTillFirstWildcardElement, file);
 
       if (wildcardPattern.match(relativePath)) {
         builder.add(file);
@@ -85,6 +73,29 @@ public class WildcardPatternFileProvider {
     }
 
     return builder.build();
+  }
+
+  private String joinElements(List<String> elements) {
+    return Joiner.on(directorySeparator).join(elements);
+  }
+
+  private static List<String> elementsTillFirstWildcard(List<String> elements) {
+    ImmutableList.Builder<String> builder = ImmutableList.builder();
+    for (String element : elements) {
+      if (containsWildcard(element)) {
+        break;
+      }
+      builder.add(element);
+    }
+    return builder.build();
+  }
+
+  private static void checkNoCurrentOrParentFolderAccess(List<String> elements) {
+    for (String element : elements) {
+      if (isCurrentOrParentFolder(element)) {
+        throw new IllegalArgumentException("Cannot contain '" + CURRENT_FOLDER + "' or '" + PARENT_FOLDER + "' after the first wildcard.");
+      }
+    }
   }
 
   private static boolean containsWildcard(String element) {
