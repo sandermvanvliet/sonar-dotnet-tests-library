@@ -95,7 +95,7 @@ public class CoverageAggregator implements BatchExtension {
     return coverage;
   }
 
-  private void aggregate(WildcardPatternFileProvider wildcardPatternFileProvider, String reportPaths, CoverageParser parser, Coverage coverage) {
+  private static void aggregate(WildcardPatternFileProvider wildcardPatternFileProvider, String reportPaths, CoverageParser parser, Coverage coverage) {
     for (String reportPathPattern : Splitter.on(',').trimResults().omitEmptyStrings().split(reportPaths)) {
       for (File reportFile : wildcardPatternFileProvider.listFiles(reportPathPattern)) {
         parser.parse(reportFile, coverage);
