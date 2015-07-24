@@ -45,13 +45,6 @@
     <system>JIRA</system>
     <url>https://jira.codehaus.org/browse/SONARNTEST</url>
   </issueManagement>
-  <distributionManagement>
-    <repository>
-      <id>codehaus-nexus-staging</id>
-      <name>Codehaus Release Repository</name>
-      <url>https://nexus.codehaus.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
 
   <properties>
     <sonarqube.version>4.5.2</sonarqube.version>
