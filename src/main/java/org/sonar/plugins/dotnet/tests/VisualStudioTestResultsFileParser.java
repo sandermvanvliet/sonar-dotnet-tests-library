@@ -20,10 +20,9 @@
 package org.sonar.plugins.dotnet.tests;
 
 import com.google.common.base.Preconditions;
+import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
 
 public class VisualStudioTestResultsFileParser implements UnitTestResultsParser {
 
@@ -73,13 +72,13 @@ public class VisualStudioTestResultsFileParser implements UnitTestResultsParser 
     private void handleCountersTag() {
       foundCounters = true;
 
-      int passed = xmlParserHelper.getRequiredIntAttribute("passed");
-      int failed = xmlParserHelper.getRequiredIntAttribute("failed");
-      int errors = xmlParserHelper.getRequiredIntAttribute("error");
-      int timeout = xmlParserHelper.getRequiredIntAttribute("timeout");
-      int aborted = xmlParserHelper.getRequiredIntAttribute("aborted");
+      int passed = xmlParserHelper.getIntAttributeOrZero("passed");
+      int failed = xmlParserHelper.getIntAttributeOrZero("failed");
+      int errors = xmlParserHelper.getIntAttributeOrZero("error");
+      int timeout = xmlParserHelper.getIntAttributeOrZero("timeout");
+      int aborted = xmlParserHelper.getIntAttributeOrZero("aborted");
 
-      int inconclusive = xmlParserHelper.getRequiredIntAttribute("inconclusive");
+      int inconclusive = xmlParserHelper.getIntAttributeOrZero("inconclusive");
 
       int tests = passed + failed + errors + timeout + aborted;
       int skipped = inconclusive;
