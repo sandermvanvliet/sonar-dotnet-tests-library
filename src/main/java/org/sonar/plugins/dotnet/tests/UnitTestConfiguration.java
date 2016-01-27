@@ -23,10 +23,12 @@ public class UnitTestConfiguration {
 
   private final String visualStudioTestResultsFilePropertyKey;
   private final String nunitTestResultsFilePropertyKey;
+  private final String xunitTestResultsFilePropertyKey;
 
-  public UnitTestConfiguration(String visualStudioTestResultsFilePropertyKey, String nunitTestResultsFilePropertyKey) {
+  public UnitTestConfiguration(String visualStudioTestResultsFilePropertyKey, String nunitTestResultsFilePropertyKey, String xunitTestResultsFilePropertyKey) {
     this.visualStudioTestResultsFilePropertyKey = visualStudioTestResultsFilePropertyKey;
     this.nunitTestResultsFilePropertyKey = nunitTestResultsFilePropertyKey;
+    this.xunitTestResultsFilePropertyKey = xunitTestResultsFilePropertyKey;
   }
 
   public String visualStudioTestResultsFilePropertyKey() {
@@ -35,6 +37,10 @@ public class UnitTestConfiguration {
 
   public String nunitTestResultsFilePropertyKey() {
     return nunitTestResultsFilePropertyKey;
+  }
+
+  public String xunitTestResultsFilePropertyKey() {
+    return xunitTestResultsFilePropertyKey;
   }
 
 }
