@@ -56,6 +56,7 @@ public class UnitTestResultsImportSensor implements Sensor {
     context.saveMeasure(CoreMetrics.TEST_ERRORS, aggregatedResults.errors());
     context.saveMeasure(CoreMetrics.TEST_FAILURES, aggregatedResults.failures());
     context.saveMeasure(CoreMetrics.SKIPPED_TESTS, aggregatedResults.skipped());
+    context.saveMeasure(CoreMetrics.TEST_EXECUTION_TIME, new Long(aggregatedResults.executionTime()).doubleValue());
 
     if (aggregatedResults.tests() > 0) {
       context.saveMeasure(CoreMetrics.TEST_SUCCESS_DENSITY, aggregatedResults.passedPercentage());
