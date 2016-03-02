@@ -72,7 +72,7 @@ public class NUnitTestResultsFileParser implements UnitTestResultsParser {
       int passed = total - errors - failures - inconclusive;
       int skipped = inconclusive + ignored;
 
-      unitTestResults.add(tests, passed, skipped, failures, errors);
+      unitTestResults.add(tests, passed, skipped, failures, errors, 0);
     }
   }
 

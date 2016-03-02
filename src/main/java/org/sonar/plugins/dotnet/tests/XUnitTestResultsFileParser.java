@@ -72,7 +72,7 @@ public class XUnitTestResultsFileParser implements UnitTestResultsParser {
       int skipped = xmlParserHelper.getRequiredIntAttribute("skipped");
       int errors = xmlParserHelper.getIntAttributeOrZero("errors");
 
-      unitTestResults.add(total, passed, skipped, failed, errors);
+      unitTestResults.add(total, passed, skipped, failed, errors, 0);
     }
 
   }

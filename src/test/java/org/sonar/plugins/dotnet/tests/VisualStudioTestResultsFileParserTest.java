@@ -72,4 +72,11 @@ public class VisualStudioTestResultsFileParserTest {
     assertThat(results.errors()).isEqualTo(0);
   }
 
+  @Test
+  public void valid_with_duration() {
+    UnitTestResults results = new UnitTestResults();
+    new VisualStudioTestResultsFileParser().parse(new File("src/test/resources/visualstudio_test_results/valid_with_duration.trx"), results);
+
+    assertThat(results.executionTime()).isEqualTo(1000);
+  }
 }

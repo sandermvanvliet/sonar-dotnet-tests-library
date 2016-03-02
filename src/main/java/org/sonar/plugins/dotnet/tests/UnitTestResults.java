@@ -26,13 +26,15 @@ public class UnitTestResults {
   private int skipped;
   private int failures;
   private int errors;
+  private long executionTime;
 
-  public void add(int tests, int passed, int skipped, int failures, int errors) {
+  public void add(int tests, int passed, int skipped, int failures, int errors, long executionTime) {
     this.tests += tests;
     this.passed += passed;
     this.skipped += skipped;
     this.failures += failures;
     this.errors += errors;
+    this.executionTime += executionTime;
   }
 
   public double tests() {
@@ -55,4 +57,7 @@ public class UnitTestResults {
     return errors;
   }
 
+  public long executionTime() {
+    return executionTime;
+  }
 }

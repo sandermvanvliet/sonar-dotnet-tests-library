@@ -21,6 +21,11 @@ package org.sonar.plugins.dotnet.tests;
 
 import com.google.common.base.Preconditions;
 import java.io.File;
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +71,9 @@ public class VisualStudioTestResultsFileParser implements UnitTestResultsParser 
         if ("Counters".equals(tagName)) {
           handleCountersTag();
         }
+        if("Times".equals(tagName)) {
+          handleTimesTag();
+        }
       }
     }
 
@@ -84,13 +92,30 @@ public class VisualStudioTestResultsFileParser implements UnitTestResultsParser 
       int skipped = inconclusive;
       int failures = timeout + failed + aborted;
 
-      unitTestResults.add(tests, passed, skipped, failures, errors);
+      unitTestResults.add(tests, passed, skipped, failures, errors, 0);
+    }
+
+    private void handleTimesTag() {
+      String start = xmlParserHelper.getAttribute("start");
+      String finish = xmlParserHelper.getAttribute("finish");
+      
+      long duration = 0;
+
+      try {
+        DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSXXX");
+        Date startDate = fmt.parse(start);
+        Date finishDate = fmt.parse(finish);
+
+        duration = finishDate.getTime() - startDate.getTime();
+      } catch(ParseException ex) {
+        // If date can't be parsed we just use the default value
+      }
+
+      unitTestResults.add(0, 0, 0, 0, 0, duration);
     }
 
     private void checkRootTag() {
       xmlParserHelper.checkRootTag("TestRun");
     }
-
   }
-
 }
