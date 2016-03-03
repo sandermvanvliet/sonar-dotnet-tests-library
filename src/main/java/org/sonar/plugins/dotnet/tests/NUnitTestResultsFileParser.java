@@ -50,9 +50,19 @@ public class NUnitTestResultsFileParser implements UnitTestResultsParser {
         xmlParserHelper = new XmlParserHelper(file);
         checkRootTag();
         handleTestResultsTag();
+        dispatchTags();
       } finally {
         if (xmlParserHelper != null) {
           xmlParserHelper.close();
+        }
+      }
+    }
+
+    private void dispatchTags() {
+      String tagName;
+      while ((tagName = xmlParserHelper.nextTag()) != null) {
+        if ("test-suite".equals(tagName)) {
+          handleTestSuiteTag();
         }
       }
     }
@@ -73,6 +83,14 @@ public class NUnitTestResultsFileParser implements UnitTestResultsParser {
       int skipped = inconclusive + ignored;
 
       unitTestResults.add(tests, passed, skipped, failures, errors, 0);
+    }
+
+    private void handleTestSuiteTag() {
+      String timeAttribute = xmlParserHelper.getAttribute("time");
+
+      double time = Double.parseDouble(timeAttribute);
+
+      unitTestResults.add(0, 0, 0, 0, 0, (long)(time * 1000));
     }
   }
 

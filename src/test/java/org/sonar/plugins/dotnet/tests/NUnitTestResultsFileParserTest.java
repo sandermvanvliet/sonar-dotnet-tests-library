@@ -61,4 +61,16 @@ public class NUnitTestResultsFileParserTest {
     assertThat(results.errors()).isEqualTo(30);
   }
 
+  @Test
+  public void valid_with_time() {
+    UnitTestResults results = new UnitTestResults();
+    new NUnitTestResultsFileParser().parse(new File("src/test/resources/nunit/nunit2_valid_with_time.xml"), results);
+
+    assertThat(results.tests()).isEqualTo(196);
+    assertThat(results.passedPercentage()).isEqualTo(146 * 100.0 / 196);
+    assertThat(results.skipped()).isEqualTo(7);
+    assertThat(results.failures()).isEqualTo(20);
+    assertThat(results.errors()).isEqualTo(30);
+    assertThat(results.executionTime()).isEqualTo(732);
+  }
 }
