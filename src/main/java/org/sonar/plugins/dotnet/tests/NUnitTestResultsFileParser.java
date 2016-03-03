@@ -23,6 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
 
 public class NUnitTestResultsFileParser implements UnitTestResultsParser {
 
@@ -88,9 +91,18 @@ public class NUnitTestResultsFileParser implements UnitTestResultsParser {
     private void handleTestSuiteTag() {
       String timeAttribute = xmlParserHelper.getAttribute("time");
 
-      double time = Double.parseDouble(timeAttribute);
+      long executionTime = 0;
 
-      unitTestResults.add(0, 0, 0, 0, 0, (long)(time * 1000));
+      try {
+         NumberFormat usFormat = NumberFormat.getInstance(Locale.US);
+         Number number = usFormat.parse(timeAttribute);
+         double time = number.doubleValue();
+         executionTime = (long)(time * 1000);
+      } catch(ParseException px) {
+        // Use the default value when we can't parse the input
+      }
+
+      unitTestResults.add(0, 0, 0, 0, 0, executionTime);
     }
   }
 
