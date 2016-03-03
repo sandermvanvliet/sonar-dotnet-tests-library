@@ -20,6 +20,9 @@
 package org.sonar.plugins.dotnet.tests;
 
 import java.io.File;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,8 +74,20 @@ public class XUnitTestResultsFileParser implements UnitTestResultsParser {
       int failed = xmlParserHelper.getRequiredIntAttribute("failed");
       int skipped = xmlParserHelper.getRequiredIntAttribute("skipped");
       int errors = xmlParserHelper.getIntAttributeOrZero("errors");
+      String timeAsString = xmlParserHelper.getAttribute("time");
+      long executionTime = 0;
 
-      unitTestResults.add(total, passed, skipped, failed, errors, 0);
+
+      try {
+         NumberFormat usFormat = NumberFormat.getInstance(Locale.US);
+         Number number = usFormat.parse(timeAsString);
+         double time = number.doubleValue();
+         executionTime = (long)(time * 1000);
+      } catch(ParseException px) {
+        // Use the default value when we can't parse the input
+      }
+
+      unitTestResults.add(total, passed, skipped, failed, errors, executionTime);
     }
 
   }
